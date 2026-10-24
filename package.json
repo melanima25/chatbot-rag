@@ -1,0 +1,38 @@
+{
+  "name": "chatbot-rag",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Chatbot de atendimento com RAG (projeto de portfólio, dados fictícios)",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @chatbot/api",
+    "build": "npm run build -w @chatbot/api",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:integration": "npm run test:integration -w @chatbot/api",
+    "db:generate": "npm run db:generate -w @chatbot/api",
+    "db:migrate": "npm run db:migrate -w @chatbot/api",
+    "ingest": "npm run ingest -w @chatbot/api",
+    "buscar": "npm run buscar -w @chatbot/api --"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "esbuild": "^0.28.2",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.9",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.71.1",
+    "vitest": "^5.0.3"
+  }
+}

@@ -1,0 +1,4 @@
+* text=auto
+# scripts executados dentro de containers Linux precisam de quebra de linha LF (no Windows, CRLF quebra o #!/bin/sh)
+*.sh text eol=lf
+docker/* text eol=lf

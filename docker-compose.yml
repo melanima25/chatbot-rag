@@ -1,0 +1,22 @@
+# Só o banco: Postgres 16 com a extensão pgvector já instalada.
+#   docker compose up -d db
+# Credenciais abaixo são só para a sua máquina; não use em produção.
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: chatbot
+      POSTGRES_PASSWORD: chatbot
+      POSTGRES_DB: chatbot
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U chatbot -d chatbot']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:
