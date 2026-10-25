@@ -44,3 +44,21 @@ Neon, plano Free: pgvector incluído, 1 GB por projeto, 100 horas de computaçã
 - https://docs.voyageai.com/pricing
 - https://developers.openai.com/api/docs/models/text-embedding-3-small
 - https://neon.com/pricing
+
+## Medido em 25/10/2026 (primeira rodada com o modelo de texto real)
+
+Modelo de texto: `@cf/meta/llama-3.1-8b-instruct-fp8-fast` (padrão do projeto). Quatro perguntas respondidas, uso informado pela API:
+
+| Pergunta               | Tokens de entrada | Tokens de saída | Neurons | US$      |
+| ---------------------- | ----------------- | --------------- | ------- | -------- |
+| Horário no sábado      | 415               | 23              | 2,5     | 0,000028 |
+| Cartão parcelado       | 538               | 48              | 3,9     | 0,000043 |
+| Polir um SUV           | 811               | 27              | 4,3     | 0,000047 |
+| Vitrificação de pickup | 818               | 38              | 4,7     | 0,000051 |
+
+- **Média: 646 tokens de entrada e 34 de saída, cerca de 3,8 neurons por resposta.** A estimativa anterior (19 neurons) tinha como premissa 2.000 tokens de entrada e 300 de saída, e estava muito acima.
+- Com a média, a cota gratuita de 10.000 neurons por dia cobre perto de **2.600 respostas por dia**; com a pior da amostra (4,7 neurons), perto de 2.100.
+- Em dólar: cerca de **US$ 0,04 a cada 1.000 respostas** (se fosse pago).
+- Pergunta recusada pelo limite de similaridade **não chama o modelo de texto**: custa só o embedding da pergunta (centésimos de neuron).
+
+Limitações: amostra de 4 perguntas; os neurons foram calculados com os preços da página de preços de 17/10/2026, não lidos de uma fatura; perguntas que juntam mais trechos terão entrada maior. A medição em volume vem na S17 (tabela `mensagem`).
