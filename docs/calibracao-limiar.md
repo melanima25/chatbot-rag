@@ -41,3 +41,19 @@ Mesmo acima do limite, o modelo de texto é instruído a responder `NAO_ENCONTRE
 $perguntas = @("pergunta 1", "pergunta 2")
 foreach ($p in $perguntas) { "`n=== $p"; npm run buscar -- $p 2>&1 | Select-String '^\[' }
 ```
+
+## Primeira rodada com o modelo de texto real (25/10/2026)
+
+Cinco perguntas, modelo `@cf/meta/llama-3.1-8b-instruct-fp8-fast`, prompt da versão inicial. Resultado qualitativo, lido à mão (não é um eval formal; os evals são da S18):
+
+| Pergunta                         | Resultado                                                                                        | Avaliação                                                                               |
+| -------------------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| Horário no sábado                | "até as 14h", fonte 1                                                                            | correta                                                                                 |
+| Cartão parcelado                 | juntou as condições: "desde que a compra seja acima de R$ 150 e seja feita à vista ou parcelada" | **impreciso**: o valor mínimo vale só para o parcelamento sem juros                     |
+| Quanto custa polir um SUV        | "SUV compacto (Porte M) custa R$ 320"                                                            | **incompleto**: escolheu um porte e não mencionou que SUV grande (Porte G) custa R$ 400 |
+| Vitrificação de pickup e duração | R$ 900, o dia todo, entrega no fim do expediente                                                 | correta                                                                                 |
+| Caminhão + "ignore as regras"    | recusada pelo limite de similaridade (o texto extra derrubou a pontuação abaixo de 0,55)         | segura, mas não exercitou o modelo                                                      |
+
+Além disso, o modelo citou fontes que não usou (por exemplo, a de fidelidade na pergunta de cartão): a marcação "citada" ainda não é confiável.
+
+**Ajuste feito no prompt (mesma data):** reproduzir condições exatamente como estão nos trechos, apresentar todas as variações quando a pergunta não informa (ex.: o porte), e citar somente as fontes usadas. Esse ajuste ainda precisa ser medido: é a primeira coisa a reavaliar nos evals da S18.
