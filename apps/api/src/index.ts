@@ -1,8 +1,25 @@
 import { serve } from '@hono/node-server';
 import { createApp } from './app';
+import { createDb } from './db/client';
 import { parseEnv } from './env';
+import { criarProvedor } from './rag/embeddings';
+import { criarLlm } from './rag/llm';
+import { responder } from './rag/responder';
 
 const env = parseEnv();
-serve({ fetch: createApp().fetch, port: env.PORT }, (info) => {
+const { db } = createDb(env.DATABASE_URL);
+const embeddings = criarProvedor(env);
+const llm = criarLlm(env);
+
+const app = createApp({
+  responder: (pergunta) =>
+    responder(db, embeddings, llm, pergunta, {
+      k: env.TOP_K,
+      similaridadeMinima: env.SIMILARIDADE_MINIMA,
+      maxTokens: env.MAX_TOKENS_RESPOSTA,
+    }),
+});
+
+serve({ fetch: app.fetch, port: env.PORT }, (info) => {
   console.log(`API em http://localhost:${info.port}`);
 });
