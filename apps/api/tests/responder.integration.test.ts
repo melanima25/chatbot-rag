@@ -12,8 +12,8 @@ const { db } = conexao;
 const embeddings = new FakeEmbeddingProvider();
 
 // O provedor de mentira dá pontuações baixas (só conta palavras iguais): por isso o limite dos
-// testes é 0.08 ("cheque" dá 0.092 com a página de pagamento; "capital da França" dá 0.000). O limite real (0.55) vale para o modelo real e está em docs/calibracao-limiar.md.
-const opcoes = { similaridadeMinima: 0.08, k: 3, maxTokens: 100 };
+// testes é 0.05 ("cheque" dá 0.079 com a página de pagamento; "capital da França" dá 0.000). O limite real (0.55) vale para o modelo real e está em docs/calibracao-limiar.md.
+const opcoes = { similaridadeMinima: 0.05, k: 3, maxTokens: 100 };
 
 function llmDe(texto: string) {
   const gerar = vi.fn().mockResolvedValue({ texto, tokensEntrada: 50, tokensSaida: 10 });
