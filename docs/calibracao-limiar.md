@@ -74,3 +74,25 @@ Ações desta data:
 3. Os 13 casos testados (e o que se espera de cada um) estão em `evals/perguntas.json`: são o início do conjunto de avaliação da S18.
 
 Pontos em aberto, para medir na S18: a pergunta que mistura dois assuntos ("lavagem de R$ 40 em 3 vezes") recupera mal os trechos; a marcação de fontes "citadas" ainda erra (citou a fonte de duração numa pergunta de preço); funilaria continua abaixo do limite.
+
+## A mesma pergunta, duas pontuações (27/10/2026)
+
+Na página de chat, "Posso pagar a lavagem simples de R$ 40 em 3 vezes?" recebeu uma resposta errada ("não há informações sobre parcelamento"), enquanto a mesma pergunta com "no cartão" no fim tinha dado certo no terminal. Diagnóstico com `SIMILARIDADE_MINIMA=0.3` e `TOP_K=6`:
+
+| Candidato                        | Pontuação |
+| -------------------------------- | --------- |
+| Serviços e preços                | 0,616     |
+| Pacotes e fidelidade             | 0,588     |
+| Serviços e preços (outro trecho) | 0,578     |
+| Duração dos serviços             | 0,540     |
+| Cancelamento e remarcação        | 0,535     |
+| **Formas de pagamento**          | **0,517** |
+
+O documento certo ficou em 6º, abaixo do limite de 0,55, então não entrou no contexto (com "no cartão" ele pontuava 0,565). Com ele no contexto, o modelo respondeu certo e citou a fonte certa.
+
+Lições:
+
+1. A pontuação oscila cerca de 0,05 só com a forma de perguntar. O conjunto de avaliação da S18 precisa de **variações da mesma pergunta**.
+2. O trecho de pagamento era largo demais (Pix, cheque, recibo e parcelamento juntos). Pergunta sobre um tema específico pontua melhor com um trecho específico.
+3. Ação: o parcelamento ganhou documento próprio (`15-parcelamento-no-cartao.md`), com o exemplo exato da pergunta que falhou. O `08` mantém uma frase curta com o mesmo número e aponta para o novo.
+4. Não baixei o limite: com 0,50 a pergunta fora do negócio sobre óleo (0,486) ficaria a 0,014 de passar. Se a S18 mostrar que o problema se repete em outros temas, a alternativa a avaliar é usar o limite só para decidir **se** responde (melhor trecho acima de 0,55) e aceitar trechos de apoio com pontuação um pouco menor.

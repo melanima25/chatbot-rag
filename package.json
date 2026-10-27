@@ -12,7 +12,8 @@
   ],
   "scripts": {
     "dev": "npm run dev -w @chatbot/api",
-    "build": "npm run build -w @chatbot/api",
+    "dev:web": "npm run dev -w @chatbot/web",
+    "build": "npm run build --workspaces --if-present",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -31,6 +32,7 @@
     "esbuild": "^0.28.2",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.13.0",
     "prettier": "^3.9.9",
     "typescript": "^5.9.3",

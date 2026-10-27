@@ -11,11 +11,11 @@ Um chatbot de atendimento para um negócio pequeno: ele busca nos documentos do 
 | S15   | Base de conhecimento, banco com pgvector, divisão em trechos, ingestão, busca por similaridade    | **pronta**                                      |
 | S16   | Resposta com fontes, recusa quando a busca não acha nada parecido, rota `POST /api/chat`          | **pronta** (testada com o modelo de texto real) |
 | S17a  | Limites de uso (por IP, por conversa, teto diário de tokens), conversas guardadas, medição de uso | **pronta no código**                            |
-| S17b  | Página de chat em React que usa a API                                                             | a fazer                                         |
+| S17b  | Página de chat em React que usa a API                                                             | **pronta no código**                            |
 | S18   | Avaliação automática (evals) com perguntas e fontes esperadas                                     | a fazer                                         |
 | S19   | Deploy, demonstração pública, README final                                                        | a fazer                                         |
 
-Ainda **não há tela de chat** (vem na S17b): hoje dá para ingerir os textos, buscar e **perguntar pela linha de comando ou pela API**.
+Há uma **página de chat** (`apps/web`) e também dá para ingerir os textos, buscar e **perguntar pela linha de comando ou pela API**. A demonstração pública vem na S19.
 
 ## Como rodar
 
@@ -33,7 +33,16 @@ npm run perguntar -- "Vocês aceitam cheque?"
 
 Por padrão usa embeddings **de mentira** (locais, sem conta e sem custo): eles só acham textos com palavras em comum e servem para testar o encanamento. Para usar o modelo real do Cloudflare Workers AI, veja a seção abaixo.
 
-### Subir a API e conversar
+### Subir a API e a página de chat
+
+Em dois terminais:
+
+```bash
+npm run dev       # API em http://localhost:3000
+npm run dev:web   # página em http://localhost:5173 (o Vite repassa /api para a API)
+```
+
+Só a API, pelo `curl`:
 
 ```bash
 npm run dev
@@ -78,6 +87,7 @@ O CI do GitHub roda tudo isso a cada push, com o provedor de mentira, **sem cham
 - **Cloudflare Workers AI para tudo**, sem chave de API em produção: ver [ADR 0001](docs/adr/0001-workers-ai-sem-chave-de-api.md) e [custos](docs/custos.md).
 - **Duas barreiras contra resposta inventada**: abaixo do limite de similaridade (0,55, medido em [docs/calibracao-limiar.md](docs/calibracao-limiar.md)) o chatbot recusa sem chamar o modelo; acima dele, o modelo é instruído a responder só com os trechos e a devolver um marcador quando não souber, que também vira recusa.
 - **A pergunta do cliente é dado, não instrução**: fica separada das regras (papel `user`, dentro de um bloco delimitado) e o cliente não consegue fechar o bloco.
+- **Página de chat sem biblioteca de interface**: React + TypeScript e CSS puro, com tema claro/escuro, foco e leitor de tela (`role="log"`, `aria-live`). O texto do modelo é renderizado como texto, nunca como HTML. Cada erro da API (limite por IP com contagem regressiva, conversa cheia, limite diário, rede, servidor) tem tratamento próprio, e a pergunta digitada volta ao campo quando o envio falha. A lógica fica em um hook (`useChat`) testado separado da tela.
 - **Limites na memória e sem streaming**: ver [ADR 0002](docs/adr/0002-limites-na-memoria-e-sem-streaming.md).
 - **Tudo atrás de uma interface** (`EmbeddingProvider`): o CI e os testes usam um provedor de mentira determinístico; trocar para um modelo pago é uma classe nova.
 - **Ingestão idempotente**: cada arquivo tem um hash; se o conteúdo e o modelo são os mesmos, é pulado. Arquivo removido da pasta sai do banco.
@@ -94,6 +104,7 @@ base-conhecimento/    textos fictícios do Lava Jato Exemplo (Markdown)
 apps/api/src/rag/     chunk.ts (divisão), embeddings.ts, ingest.ts, busca.ts,
                       prompt.ts, llm.ts, responder.ts (resposta com fontes e recusa)
 apps/api/src/chat/    limitador por IP, repositório de conversas, leitura do IP
+apps/web/src/         página de chat (App.tsx, useChat.ts, api.ts) e testes
 apps/api/src/db/      schema (documento, trecho, conversa, mensagem) e migrations
 apps/api/tests/       testes de integração (Postgres + pgvector reais)
 docs/                 decisões (ADR), custos e calibração do limite
