@@ -62,3 +62,7 @@ Modelo de texto: `@cf/meta/llama-3.1-8b-instruct-fp8-fast` (padrão do projeto).
 - Pergunta recusada pelo limite de similaridade **não chama o modelo de texto**: custa só o embedding da pergunta (centésimos de neuron).
 
 Limitações: amostra de 4 perguntas; os neurons foram calculados com os preços da página de preços de 17/10/2026, não lidos de uma fatura; perguntas que juntam mais trechos terão entrada maior. A medição em volume vem na S17 (tabela `mensagem`).
+
+## Medição contínua (S17)
+
+A partir da S17, cada resposta do modelo grava os tokens reais em `mensagem`. `npm run uso` resume por dia (UTC) as respostas, as recusas, os tokens e uma estimativa de neurons contra a cota de 10.000 por dia, usando os preços acima. Esse número é uma conta, não uma fatura: confira no painel da Cloudflare.

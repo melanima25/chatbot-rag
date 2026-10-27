@@ -22,6 +22,39 @@ const EnvSchema = z
     TOP_K: z.coerce.number().int().min(1).max(10).default(4),
     /** Teto de tokens da resposta (controle de custo). */
     MAX_TOKENS_RESPOSTA: z.coerce.number().int().min(50).max(1000).default(300),
+    /** Pedidos por IP por minuto e por hora (limite na memória do servidor). */
+    LIMITE_POR_MINUTO: z.coerce.number().int().min(1).max(100).default(8),
+    LIMITE_POR_HORA: z.coerce.number().int().min(1).max(1000).default(60),
+    /** Perguntas por conversa; evita uma conversa eterna usada como túnel. */
+    LIMITE_PERGUNTAS_CONVERSA: z.coerce.number().int().min(1).max(200).default(20),
+    /**
+     * Teto global de tokens (entrada + saída) por dia UTC. O padrão fica em ~2/3 da cota grátis
+     * de 10.000 neurons/dia (≈ 1,8 milhão de tokens na média medida) para sobrar margem.
+     */
+    ORCAMENTO_TOKENS_DIA: z.coerce.number().int().min(1000).default(1_200_000),
+    /** Cabeçalho com o IP real, se houver proxy de confiança (ex.: cf-connecting-ip). */
+    IP_HEADER: z.string().min(1).optional(),
+    /** Origens autorizadas a chamar a API pelo navegador (CORS), separadas por vírgula. */
+    CORS_ORIGENS: z
+      .string()
+      .optional()
+      .transform((v) =>
+        (v ?? '')
+          .split(',')
+          .map((o) => o.trim())
+          .filter(Boolean),
+      )
+      .pipe(
+        z.array(
+          z.string().refine((o) => {
+            try {
+              return new URL(o).origin === o;
+            } catch {
+              return false;
+            }
+          }, 'cada origem deve ser só esquema + domínio, ex.: https://exemplo.com (sem barra no fim)'),
+        ),
+      ),
   })
   .superRefine((env, ctx) => {
     if (env.EMBEDDING_PROVIDER !== 'workers-ai' && env.LLM_PROVIDER !== 'workers-ai') return;
