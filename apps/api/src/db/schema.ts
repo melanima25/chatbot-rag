@@ -6,6 +6,7 @@ import {
   text,
   timestamp,
   uniqueIndex,
+  uuid,
   vector,
 } from 'drizzle-orm/pg-core';
 import { EMBEDDING_DIM } from '../rag/constantes';
@@ -40,5 +41,40 @@ export const trecho = pgTable(
   (t) => [
     uniqueIndex('trecho_documento_ordem_uq').on(t.documentoId, t.ordem),
     index('trecho_embedding_hnsw_idx').using('hnsw', t.embedding.op('vector_cosine_ops')),
+  ],
+);
+
+/**
+ * Uma conversa do widget. Não guarda IP nem nenhum dado de quem perguntou: só o id (aleatório)
+ * e a data. O limite por IP vive na memória do servidor e some junto com ele.
+ */
+export const conversa = pgTable('conversa', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  criadaEm: timestamp('criada_em', { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** Uma mensagem da conversa: a pergunta do cliente ou a resposta (ou recusa) do chatbot. */
+export const mensagem = pgTable(
+  'mensagem',
+  {
+    id: serial('id').primaryKey(),
+    conversaId: uuid('conversa_id')
+      .notNull()
+      .references(() => conversa.id, { onDelete: 'cascade' }),
+    papel: text('papel', { enum: ['cliente', 'assistente'] }).notNull(),
+    texto: text('texto').notNull(),
+    /** Só nas mensagens do assistente. */
+    tipo: text('tipo', { enum: ['resposta', 'recusa'] }),
+    motivoRecusa: text('motivo_recusa', {
+      enum: ['sem_trechos_relevantes', 'modelo_sem_resposta'],
+    }),
+    /** Uso real informado pelo provedor; nulo quando o modelo de texto não foi chamado. */
+    tokensEntrada: integer('tokens_entrada'),
+    tokensSaida: integer('tokens_saida'),
+    criadaEm: timestamp('criada_em', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index('mensagem_conversa_idx').on(t.conversaId),
+    index('mensagem_criada_em_idx').on(t.criadaEm),
   ],
 );
