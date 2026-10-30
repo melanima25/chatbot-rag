@@ -16,13 +16,12 @@ Premissa: 2.000 tokens de entrada (trechos + instruções + pergunta) e 300 de s
 - Saída: 300 / 1.000.000 × 34.868 ≈ 10,5 neurons.
 - **Total ≈ 19 neurons por mensagem**, o que daria algo como **500 mensagens por dia** dentro da cota gratuita.
 
-Isso é uma ordem de grandeza. Os tokens reais serão medidos e registrados na tabela `mensagem` (S17), e o número final do README virá dessa medição.
+**Medido em 30/10/2026** (56 perguntas × 3, modelo real): ≈ 708 tokens por pergunta (cerca de 680 de entrada e 28 de saída) e **≈ 3,8 neurons por pergunta**, bem abaixo da suposição acima. Dentro da cota gratuita de 10.000 neurons/dia cabem, na média medida, cerca de 2.600 perguntas por dia; o teto diário configurado (1,2 milhão de tokens) corta em cerca de 1.700. Os números vêm do uso informado pelo próprio provedor (`npm run uso`), com os preços de 17/10/2026; não são fatura.
 
-### Pontos a confirmar antes do deploy (S19)
+### Pontos que ficaram em aberto
 
 - O que acontece exatamente ao estourar a cota gratuita (esperado: erro, sem cobrança, no plano Free). **Não verificado.**
-- Qual modelo de texto do catálogo atual será usado (S16).
-- A página do bge-m3 mostra exemplos com o campo `text` e uma tabela de parâmetros com `contexts`. O provedor deste repositório usa `text`; o primeiro `npm run ingest` com `EMBEDDING_PROVIDER=workers-ai` confirma.
+- Resolvidos: o modelo de texto é o `@cf/meta/llama-3.1-8b-instruct-fp8-fast` (S16/S18) e o campo `text` do bge-m3 funciona (confirmado em 24/10/2026, tanto pela API REST quanto pelo binding no Worker).
 
 ## Alternativas descartadas por enquanto
 
