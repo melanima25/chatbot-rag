@@ -17,7 +17,9 @@ const EnvSchema = z
     CLOUDFLARE_ACCOUNT_ID: z.string().optional(),
     CLOUDFLARE_API_TOKEN: z.string().optional(),
     /** Abaixo desta similaridade (0 a 1) o trecho não conta, e se nenhum passar o chatbot recusa. */
-    SIMILARIDADE_MINIMA: z.coerce.number().min(0).max(1).default(0.55),
+    SIMILARIDADE_MINIMA: z.coerce.number().min(0).max(1).default(0.45),
+    /** Só entram no contexto trechos até esta distância do melhor (1 = desligado). Ver `responder.ts`. */
+    MARGEM_CONTEXTO: z.coerce.number().min(0.01).max(1).default(0.08),
     /** Quantos trechos entram no contexto da resposta. */
     TOP_K: z.coerce.number().int().min(1).max(10).default(4),
     /** Teto de tokens da resposta (controle de custo). */

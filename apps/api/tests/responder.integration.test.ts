@@ -102,4 +102,33 @@ describe('responder', () => {
     expect(mensagens[0].conteudo).not.toContain('grátis');
     expect(mensagens[1].conteudo).toContain(`<<<\n${ataque}\n>>>`);
   });
+
+  it('margem de contexto: com margem pequena só o melhor trecho vai para o modelo; sem margem, todos acima do limite', async () => {
+    const { llm: llmSem } = llmDe('Não aceitamos cheque. [1]');
+    const sem = await responder(db, embeddings, llmSem, 'Vocês aceitam cheque?', opcoes);
+    expect(sem.fontes.length).toBeGreaterThan(1);
+
+    const { llm: llmCom, gerar } = llmDe('Não aceitamos cheque. [1]');
+    const com = await responder(db, embeddings, llmCom, 'Vocês aceitam cheque?', {
+      ...opcoes,
+      margemContexto: 0.002,
+    });
+    expect(com.fontes).toHaveLength(1);
+    expect(com.fontes[0]?.caminho).toBe('08-formas-de-pagamento.md');
+    // o modelo recebeu só o trecho que sobrou
+    const mensagens = gerar.mock.calls[0]?.[0] as Array<{ papel: string; conteudo: string }>;
+    const fontes = mensagens.find((m) => m.papel === 'user')?.conteudo ?? '';
+    expect(fontes).toContain('[1]');
+    expect(fontes).not.toContain('[2]');
+  });
+
+  it('a margem nunca esvazia o contexto: o melhor trecho sempre entra se passou do limite', async () => {
+    const { llm } = llmDe('Não aceitamos cheque. [1]');
+    const r = await responder(db, embeddings, llm, 'Vocês aceitam cheque?', {
+      ...opcoes,
+      margemContexto: 0.01,
+    });
+    expect(r.tipo).toBe('resposta');
+    expect(r.fontes.length).toBeGreaterThanOrEqual(1);
+  });
 });

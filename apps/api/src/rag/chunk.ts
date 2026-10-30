@@ -20,6 +20,12 @@ export type OpcoesDivisao = {
 export const MAX_CARACTERES_PADRAO = 700;
 export const SOBREPOSICAO_PADRAO = 100;
 
+/**
+ * Muda quando o jeito de dividir muda. Entra no hash da ingestão: sem isso, uma mudança no divisor
+ * não reprocessaria os documentos (o conteúdo deles não mudou).
+ */
+export const VERSAO_DIVISOR = 2;
+
 /** Troca CRLF por LF: o mesmo arquivo tem o mesmo hash no Windows e no Linux. */
 export const normalizarQuebras = (texto: string): string => texto.replace(/\r\n?/g, '\n');
 
@@ -95,10 +101,24 @@ function colarTitulos(blocos: string[]): string[] {
   return saida;
 }
 
-/** Final do trecho anterior, começando no início de uma palavra. */
+/**
+ * Final do trecho anterior que se repete no começo do seguinte, para não perder o contexto na emenda.
+ * Começa, nesta ordem de preferência, no início de uma linha (listas e tabelas ficam com linhas
+ * inteiras), no início de uma frase, ou no início de uma palavra. Nunca começa por um fragmento
+ * como "compacto): R$ 50.", que perdeu o nome do que está sendo preço.
+ */
 function cauda(texto: string, tamanho: number): string {
   if (tamanho <= 0 || texto.length <= tamanho) return '';
   const fim = texto.slice(-tamanho);
+
+  const quebra = fim.indexOf('\n');
+  if (quebra !== -1) {
+    const linhas = fim.slice(quebra + 1).trim();
+    if (linhas) return linhas;
+  }
+  const frase = fim.search(/(?<=[.!?])\s+\S/);
+  if (frase !== -1) return fim.slice(frase).trim();
+
   const espaco = fim.search(/\s/);
   return espaco === -1 ? '' : fim.slice(espaco).trim();
 }

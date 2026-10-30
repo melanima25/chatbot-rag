@@ -25,7 +25,8 @@
     "ingest": "npm run ingest -w @chatbot/api",
     "buscar": "npm run buscar -w @chatbot/api --",
     "perguntar": "npm run perguntar -w @chatbot/api --",
-    "uso": "npm run uso -w @chatbot/api"
+    "uso": "npm run uso -w @chatbot/api",
+    "eval": "npm run eval -w @chatbot/api --"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",

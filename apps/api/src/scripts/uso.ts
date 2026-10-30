@@ -1,12 +1,7 @@
 import { count, sql } from 'drizzle-orm';
 import { createDb, schema } from '../db/client';
+import { COTA_GRATIS_NEURONS_DIA, neuronsDe } from '../custo';
 import { parseEnv } from '../env';
-
-// Preços de neurons do modelo padrão (página de preços da Cloudflare, levantada em 17/10/2026).
-// São uma conta, não uma fatura: confira no painel da Cloudflare.
-const NEURONS_POR_MILHAO_ENTRADA = 4119;
-const NEURONS_POR_MILHAO_SAIDA = 34868;
-const COTA_GRATIS_NEURONS_DIA = 10_000;
 
 const env = parseEnv();
 const { db, close } = createDb(env.DATABASE_URL);
@@ -32,9 +27,7 @@ try {
     console.log('Nenhuma mensagem registrada ainda.');
   }
   for (const l of linhas) {
-    const neurons =
-      (l.entrada / 1_000_000) * NEURONS_POR_MILHAO_ENTRADA +
-      (l.saida / 1_000_000) * NEURONS_POR_MILHAO_SAIDA;
+    const neurons = neuronsDe(l.entrada, l.saida);
     const media = l.chamadas ? neurons / l.chamadas : 0;
     console.log(
       `${l.dia}  respostas ${l.respostas}, recusas ${l.recusas}, chamadas ao modelo ${l.chamadas}, ` +

@@ -57,6 +57,33 @@ describe('dividirEmTrechos', () => {
     expect(b).toContain(ultimas.join(' '));
   });
 
+  it('a sobreposição começa no início de uma linha: lista sem pontuação nunca fica com fragmento no começo', () => {
+    // Sem ponto final de propósito: assim só a regra de "início de linha" salva o trecho de um fragmento.
+    const linhas = Array.from(
+      { length: 12 },
+      (_, i) => `- Polimento, porte ${i} (sedã médio, SUV compacto): R$ ${100 + i}`,
+    );
+    const trechos = dividirEmTrechos(linhas.join('\n'), { maxCaracteres: 300, sobreposicao: 100 });
+    expect(trechos.length).toBeGreaterThan(1);
+    for (const t of trechos) {
+      for (const linha of t.split('\n').filter(Boolean)) {
+        expect(linha).toMatch(/^- Polimento, porte \d+ \(sedã médio, SUV compacto\): R\$ \d+$/);
+      }
+    }
+  });
+
+  it('em texto corrido a sobreposição começa no início de uma frase', () => {
+    const texto =
+      'Primeira frase longa sobre o assunto principal do documento aqui. ' +
+      'Segunda frase também comprida falando de outra coisa bem diferente agora. ' +
+      'Terceira frase final que encerra o trecho com bastante conteúdo útil. ' +
+      'Quarta frase que já pertence ao trecho seguinte do documento todo.';
+    const [a, b] = dividirEmTrechos(texto, { maxCaracteres: 150, sobreposicao: 90 });
+    expect(a).toBeDefined();
+    const inicioDoSeguinte = (b ?? '').split('\n\n')[0] ?? '';
+    expect(/^[A-ZÁÉÍÓÚ]/.test(inicioDoSeguinte)).toBe(true);
+  });
+
   it('mantém parágrafos inteiros quando cabem e o título junto do parágrafo seguinte', () => {
     const texto =
       '# Pagamento\n\nAceitamos Pix e dinheiro.\n\n## Cartão\n\nCrédito em até 3 vezes.';

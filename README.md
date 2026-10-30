@@ -6,14 +6,14 @@ Um chatbot de atendimento para um negócio pequeno: ele busca nos documentos do 
 
 ## Onde o projeto está
 
-| Etapa | O que entrega                                                                                     | Situação                                        |
-| ----- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| S15   | Base de conhecimento, banco com pgvector, divisão em trechos, ingestão, busca por similaridade    | **pronta**                                      |
-| S16   | Resposta com fontes, recusa quando a busca não acha nada parecido, rota `POST /api/chat`          | **pronta** (testada com o modelo de texto real) |
-| S17a  | Limites de uso (por IP, por conversa, teto diário de tokens), conversas guardadas, medição de uso | **pronta no código**                            |
-| S17b  | Página de chat em React que usa a API                                                             | **pronta no código**                            |
-| S18   | Avaliação automática (evals) com perguntas e fontes esperadas                                     | a fazer                                         |
-| S19   | Deploy, demonstração pública, README final                                                        | a fazer                                         |
+| Etapa | O que entrega                                                                                         | Situação                                             |
+| ----- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| S15   | Base de conhecimento, banco com pgvector, divisão em trechos, ingestão, busca por similaridade        | **pronta**                                           |
+| S16   | Resposta com fontes, recusa quando a busca não acha nada parecido, rota `POST /api/chat`              | **pronta** (testada com o modelo de texto real)      |
+| S17a  | Limites de uso (por IP, por conversa, teto diário de tokens), conversas guardadas, medição de uso     | **pronta no código**                                 |
+| S17b  | Página de chat em React que usa a API                                                                 | **pronta no código**                                 |
+| S18   | Avaliação automática (evals): 48 perguntas com a fonte esperada, `npm run eval`, calibração do limite | **ferramenta pronta; falta medir com o modelo real** |
+| S19   | Deploy, demonstração pública, README final                                                            | a fazer                                              |
 
 Há uma **página de chat** (`apps/web`) e também dá para ingerir os textos, buscar e **perguntar pela linha de comando ou pela API**. A demonstração pública vem na S19.
 
@@ -72,6 +72,20 @@ Cada resposta do modelo grava os **tokens reais** na tabela `mensagem`; `npm run
 3. `npm run ingest` de novo. Como o modelo mudou, os documentos são reingeridos sozinhos.
 4. O modelo de texto é `LLM_MODEL` (padrão `@cf/meta/llama-3.1-8b-instruct-fp8-fast`); trocar é só mudar a variável.
 
+### Avaliação (evals)
+
+`evals/perguntas.json` tem 48 perguntas, cada uma com o resultado esperado **de acordo com a base** (não com o que o chatbot respondeu): o texto que a resposta deve conter, o documento que deve ser recuperado, e as perguntas fora da base que devem ser recusadas. Inclui variações da mesma pergunta, perguntas sem acento e tentativas de injeção.
+
+```bash
+npm run eval                          # roda todos os casos no mesmo código que a API usa
+npm run eval -- --repeticoes=3        # repete cada pergunta: mostra os casos em que o modelo varia
+npm run eval -- --id=9,14             # só alguns casos
+npm run eval -- --salvar=evals/resultados/2026-10-28.json
+npm run eval -- --calibrar            # sem chamar o modelo de texto: o que cada limite de similaridade faria
+```
+
+O relatório separa o que importa: perguntas que a base cobre e o chatbot recusou sem precisar, perguntas **fora** da base que ele respondeu (o erro mais grave: é inventar), se o documento certo foi recuperado e se foi citado, e o gasto em neurons. Falhas já conhecidas ficam marcadas no próprio caso (`falhaConhecida`) e não contam como regressão; se uma delas passar a funcionar, o relatório avisa. O comando termina com erro se aparecer falha nova. Não roda no CI porque usa o modelo real (que tem cota); o CI testa a lógica da avaliação com provedores de mentira.
+
 ### Testes
 
 ```bash
@@ -85,13 +99,13 @@ O CI do GitHub roda tudo isso a cada push, com o provedor de mentira, **sem cham
 
 - **pgvector no Postgres** em vez de um banco vetorial à parte: um banco só, e a busca é SQL (`ORDER BY embedding <=> vetor`) com índice HNSW.
 - **Cloudflare Workers AI para tudo**, sem chave de API em produção: ver [ADR 0001](docs/adr/0001-workers-ai-sem-chave-de-api.md) e [custos](docs/custos.md).
-- **Duas barreiras contra resposta inventada**: abaixo do limite de similaridade (0,55, medido em [docs/calibracao-limiar.md](docs/calibracao-limiar.md)) o chatbot recusa sem chamar o modelo; acima dele, o modelo é instruído a responder só com os trechos e a devolver um marcador quando não souber, que também vira recusa.
+- **Duas barreiras contra resposta inventada**: abaixo do limite de similaridade (0,45, medido com 48 perguntas, ver [ADR 0003](docs/adr/0003-limite-e-margem-de-contexto.md) e [docs/calibracao-limiar.md](docs/calibracao-limiar.md)) o chatbot recusa sem chamar o modelo; acima dele, o modelo é instruído a responder só com os trechos (os mais próximos do melhor, margem de 0,08) e a devolver um marcador quando não souber, que também vira recusa.
 - **A pergunta do cliente é dado, não instrução**: fica separada das regras (papel `user`, dentro de um bloco delimitado) e o cliente não consegue fechar o bloco.
 - **Página de chat sem biblioteca de interface**: React + TypeScript e CSS puro, com tema claro/escuro, foco e leitor de tela (`role="log"`, `aria-live`). O texto do modelo é renderizado como texto, nunca como HTML. Cada erro da API (limite por IP com contagem regressiva, conversa cheia, limite diário, rede, servidor) tem tratamento próprio, e a pergunta digitada volta ao campo quando o envio falha. A lógica fica em um hook (`useChat`) testado separado da tela.
 - **Limites na memória e sem streaming**: ver [ADR 0002](docs/adr/0002-limites-na-memoria-e-sem-streaming.md).
 - **Tudo atrás de uma interface** (`EmbeddingProvider`): o CI e os testes usam um provedor de mentira determinístico; trocar para um modelo pago é uma classe nova.
 - **Ingestão idempotente**: cada arquivo tem um hash; se o conteúdo e o modelo são os mesmos, é pulado. Arquivo removido da pasta sai do banco.
-- **Divisão em trechos testada**: respeita parágrafos, nunca corta palavra ao meio, mantém título junto do texto e repete um pedaço do trecho anterior para não perder contexto.
+- **Divisão em trechos testada**: respeita parágrafos, nunca corta palavra ao meio, mantém título junto do texto e repete o final do trecho anterior (começando numa linha ou frase inteira, nunca num fragmento) para não perder contexto.
 
 ## Como usei IA
 

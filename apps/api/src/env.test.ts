@@ -33,9 +33,10 @@ describe('parseEnv', () => {
     }
   });
 
-  it('usa os padrões de calibração: limite 0.55, 4 trechos, 300 tokens, modelo fixo', () => {
+  it('usa os padrões de calibração: limite 0.45, margem 0.08, 4 trechos, 300 tokens, modelo fixo', () => {
     const env = parseEnv(base);
-    expect(env.SIMILARIDADE_MINIMA).toBe(0.55);
+    expect(env.SIMILARIDADE_MINIMA).toBe(0.45);
+    expect(env.MARGEM_CONTEXTO).toBe(0.08);
     expect(env.TOP_K).toBe(4);
     expect(env.MAX_TOKENS_RESPOSTA).toBe(300);
     expect(env.LLM_PROVIDER).toBe('fake');
@@ -77,5 +78,12 @@ describe('parseEnv', () => {
   it('rejeita limites fora da faixa (S17)', () => {
     expect(() => parseEnv({ ...base, LIMITE_POR_MINUTO: '0' })).toThrow();
     expect(() => parseEnv({ ...base, ORCAMENTO_TOKENS_DIA: '10' })).toThrow();
+  });
+
+  it('MARGEM_CONTEXTO: 1 desliga, e rejeita valores fora da faixa', () => {
+    expect(parseEnv({ ...base, MARGEM_CONTEXTO: '1' }).MARGEM_CONTEXTO).toBe(1);
+    expect(parseEnv({ ...base, MARGEM_CONTEXTO: '0.2' }).MARGEM_CONTEXTO).toBe(0.2);
+    expect(() => parseEnv({ ...base, MARGEM_CONTEXTO: '0' })).toThrow();
+    expect(() => parseEnv({ ...base, MARGEM_CONTEXTO: '2' })).toThrow();
   });
 });

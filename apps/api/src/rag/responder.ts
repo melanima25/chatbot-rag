@@ -34,10 +34,21 @@ export type Resultado = {
 export type OpcoesResponder = {
   k: number;
   similaridadeMinima: number;
+  /**
+   * Só entram no contexto os trechos a no máximo esta distância (em pontos de similaridade) do melhor.
+   * O limite decide SE responde; a margem decide QUANTO contexto vai para o modelo. Trechos fracos no
+   * contexto confundem o modelo pequeno. 1 = desligado (qualquer trecho acima do limite entra). Padrão 0,08: ver docs/adr/0003.
+   */
+  margemContexto: number;
   maxTokens: number;
 };
 
-export const OPCOES_PADRAO: OpcoesResponder = { k: 4, similaridadeMinima: 0.55, maxTokens: 300 };
+export const OPCOES_PADRAO: OpcoesResponder = {
+  k: 4,
+  similaridadeMinima: 0.45,
+  maxTokens: 300,
+  margemContexto: 0.08,
+};
 
 /** Função que o resto do sistema usa; as rotas só conhecem esta assinatura. */
 export type ResponderFn = (pergunta: string) => Promise<Resultado>;
@@ -55,10 +66,13 @@ export async function responder(
   pergunta: string,
   opcoes: Partial<OpcoesResponder> = {},
 ): Promise<Resultado> {
-  const { k, similaridadeMinima, maxTokens } = { ...OPCOES_PADRAO, ...opcoes };
+  const { k, similaridadeMinima, maxTokens, margemContexto } = { ...OPCOES_PADRAO, ...opcoes };
 
   const candidatos = await buscarTrechos(db, embeddings, pergunta, k);
-  const relevantes = candidatos.filter((c) => c.similaridade >= similaridadeMinima);
+  const melhor = candidatos[0]?.similaridade ?? 0;
+  const relevantes = candidatos.filter(
+    (c) => c.similaridade >= similaridadeMinima && c.similaridade >= melhor - margemContexto,
+  );
   if (relevantes.length === 0) {
     return {
       tipo: 'recusa',
