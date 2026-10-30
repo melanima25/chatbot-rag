@@ -16,6 +16,7 @@ try {
   const r = await responder(db, criarProvedor(env), criarLlm(env), pergunta, {
     k: env.TOP_K,
     similaridadeMinima: env.SIMILARIDADE_MINIMA,
+    margemContexto: env.MARGEM_CONTEXTO,
     maxTokens: env.MAX_TOKENS_RESPOSTA,
   });
   console.log(`\n[${r.tipo.toUpperCase()}${r.motivoRecusa ? `: ${r.motivoRecusa}` : ''}]`);

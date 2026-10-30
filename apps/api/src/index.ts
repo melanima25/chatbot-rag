@@ -29,6 +29,7 @@ const app = createApp({
     responder(db, embeddings, llm, pergunta, {
       k: env.TOP_K,
       similaridadeMinima: env.SIMILARIDADE_MINIMA,
+      margemContexto: env.MARGEM_CONTEXTO,
       maxTokens: env.MAX_TOKENS_RESPOSTA,
     }),
 });

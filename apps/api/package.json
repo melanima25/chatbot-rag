@@ -15,7 +15,8 @@
     "ingest": "tsx --env-file-if-exists=../../.env src/scripts/ingest.ts",
     "buscar": "tsx --env-file-if-exists=../../.env src/scripts/buscar.ts",
     "perguntar": "tsx --env-file-if-exists=../../.env src/scripts/perguntar.ts",
-    "uso": "tsx --env-file-if-exists=../../.env src/scripts/uso.ts"
+    "uso": "tsx --env-file-if-exists=../../.env src/scripts/uso.ts",
+    "eval": "tsx --env-file-if-exists=../../.env src/scripts/eval.ts"
   },
   "dependencies": {
     "@hono/node-server": "^2.1.4",

@@ -9,6 +9,7 @@ import {
   lerMarkdown,
   normalizarQuebras,
   type OpcoesDivisao,
+  VERSAO_DIVISOR,
 } from './chunk';
 import type { EmbeddingProvider } from './embeddings';
 
@@ -46,7 +47,10 @@ export async function ingerir(
 
   for (const nome of nomes) {
     const bruto = normalizarQuebras(await readFile(join(pasta, nome), 'utf8'));
-    const hash = createHash('sha256').update(bruto).digest('hex');
+    const hash = createHash('sha256')
+      .update(`divisor:${VERSAO_DIVISOR}\n`)
+      .update(bruto)
+      .digest('hex');
     const antes = existentes.get(nome);
     if (antes && antes.hashConteudo === hash && antes.modeloEmbedding === provedor.modelo) {
       relatorio.inalterados.push(nome);
