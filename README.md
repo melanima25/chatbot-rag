@@ -1,21 +1,21 @@
 # Chatbot RAG: atendimento que responde só com base nos documentos
 
-> **Projeto de demonstração em construção (semana 17 de 19).** O negócio, os preços e os textos são **fictícios** ("Lava Jato Exemplo"). Não há dados reais.
+> **Projeto de demonstração em construção (semana 19 de 19).** O negócio, os preços e os textos são **fictícios** ("Lava Jato Exemplo"). Não há dados reais.
 
 Um chatbot de atendimento para um negócio pequeno: ele busca nos documentos do negócio os trechos que respondem à pergunta, responde **só com base neles**, cita a fonte e, quando não encontra, diz que não sabe e oferece falar com uma pessoa.
 
 ## Onde o projeto está
 
-| Etapa | O que entrega                                                                                         | Situação                                             |
-| ----- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| S15   | Base de conhecimento, banco com pgvector, divisão em trechos, ingestão, busca por similaridade        | **pronta**                                           |
-| S16   | Resposta com fontes, recusa quando a busca não acha nada parecido, rota `POST /api/chat`              | **pronta** (testada com o modelo de texto real)      |
-| S17a  | Limites de uso (por IP, por conversa, teto diário de tokens), conversas guardadas, medição de uso     | **pronta no código**                                 |
-| S17b  | Página de chat em React que usa a API                                                                 | **pronta no código**                                 |
-| S18   | Avaliação automática (evals): 48 perguntas com a fonte esperada, `npm run eval`, calibração do limite | **ferramenta pronta; falta medir com o modelo real** |
-| S19   | Deploy, demonstração pública, README final                                                            | a fazer                                              |
+| Etapa | O que entrega                                                                                     | Situação                                                          |
+| ----- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| S15   | Base de conhecimento, banco com pgvector, divisão em trechos, ingestão, busca por similaridade    | **pronta**                                                        |
+| S16   | Resposta com fontes, recusa quando a busca não acha nada parecido, rota `POST /api/chat`          | **pronta** (testada com o modelo de texto real)                   |
+| S17a  | Limites de uso (por IP, por conversa, teto diário de tokens), conversas guardadas, medição de uso | **pronta**                                                        |
+| S17b  | Página de chat em React que usa a API                                                             | **pronta**                                                        |
+| S18   | Avaliação automática: 56 perguntas com a fonte esperada, `npm run eval`, limite calibrado         | **pronta**: 53 de 56 casos certos (95%), medido com o modelo real |
+| S19   | Deploy (Worker + Hyperdrive), demonstração pública, README final                                  | **código pronto; falta publicar** (ver "Deploy")                  |
 
-Há uma **página de chat** (`apps/web`) e também dá para ingerir os textos, buscar e **perguntar pela linha de comando ou pela API**. A demonstração pública vem na S19.
+Há uma **página de chat** (`apps/web`) e também dá para ingerir os textos, buscar e **perguntar pela linha de comando ou pela API**. A demonstração pública vem com o deploy.
 
 ## Como rodar
 
@@ -86,6 +86,21 @@ npm run eval -- --calibrar            # sem chamar o modelo de texto: o que cada
 
 O relatório separa o que importa: perguntas que a base cobre e o chatbot recusou sem precisar, perguntas **fora** da base que ele respondeu (o erro mais grave: é inventar), se o documento certo foi recuperado e se foi citado, e o gasto em neurons. Falhas já conhecidas ficam marcadas no próprio caso (`falhaConhecida`) e não contam como regressão; se uma delas passar a funcionar, o relatório avisa. O comando termina com erro se aparecer falha nova. Não roda no CI porque usa o modelo real (que tem cota); o CI testa a lógica da avaliação com provedores de mentira.
 
+### Deploy (Cloudflare Worker)
+
+Um Worker só serve a página e a API; o modelo vem pelo binding `env.AI` (sem token) e o banco pelo Hyperdrive. Decisões em [ADR 0004](docs/adr/0004-um-worker-com-hyperdrive.md).
+
+```
+npm install -D wrangler -w @chatbot/api   # instala o wrangler (só na primeira vez)
+npx wrangler login                # abre o navegador, uma vez
+# cria a conexão com o Neon (a string vem da variável, nunca digitada nem versionada):
+npx wrangler hyperdrive create chatbot-neon --connection-string=$DATABASE_URL --caching-disabled
+# copie o "id" mostrado para apps/api/wrangler.jsonc (o id não é segredo)
+npm run deploy                    # gera a página e publica o Worker
+```
+
+O banco precisa ter as migrations e a base ingerida (`npm run db:migrate` e `npm run ingest`, do computador, apontando para o Neon). Para testar localmente com o Worker de verdade: `npm run cf:dev` (usa o modelo real e a variável `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` com a string do banco).
+
 ### Testes
 
 ```bash
@@ -118,6 +133,7 @@ base-conhecimento/    textos fictícios do Lava Jato Exemplo (Markdown)
 apps/api/src/rag/     chunk.ts (divisão), embeddings.ts, ingest.ts, busca.ts,
                       prompt.ts, llm.ts, responder.ts (resposta com fontes e recusa)
 apps/api/src/chat/    limitador por IP, repositório de conversas, leitura do IP
+apps/api/src/worker.ts  entrada do Cloudflare Worker (binding de IA + Hyperdrive); wrangler.jsonc
 apps/web/src/         página de chat (App.tsx, useChat.ts, api.ts) e testes
 apps/api/src/db/      schema (documento, trecho, conversa, mensagem) e migrations
 apps/api/tests/       testes de integração (Postgres + pgvector reais)

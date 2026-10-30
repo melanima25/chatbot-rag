@@ -26,7 +26,9 @@
     "buscar": "npm run buscar -w @chatbot/api --",
     "perguntar": "npm run perguntar -w @chatbot/api --",
     "uso": "npm run uso -w @chatbot/api",
-    "eval": "npm run eval -w @chatbot/api --"
+    "eval": "npm run eval -w @chatbot/api --",
+    "deploy": "npm run build -w @chatbot/web && npm run cf:deploy -w @chatbot/api",
+    "cf:dev": "npm run build -w @chatbot/web && npm run cf:dev -w @chatbot/api"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
