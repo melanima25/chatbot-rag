@@ -5,3 +5,5 @@ package-lock.json
 apps/api/drizzle/meta
 
 .wrangler
+
+evals/resultados/
