@@ -1,6 +1,6 @@
 # Chatbot RAG: atendimento que responde só com base nos documentos
 
-> **Projeto de demonstração em construção (semana 19 de 19).** O negócio, os preços e os textos são **fictícios** ("Lava Jato Exemplo"). Não há dados reais.
+> **Demonstração no ar:** https://chatbot-rag.brenojf19.workers.dev/ · O negócio, os preços e os textos são **fictícios** ("Lava Jato Exemplo"). Não há dados reais.
 
 Um chatbot de atendimento para um negócio pequeno: ele busca nos documentos do negócio os trechos que respondem à pergunta, responde **só com base neles**, cita a fonte e, quando não encontra, diz que não sabe e oferece falar com uma pessoa.
 
@@ -13,9 +13,9 @@ Um chatbot de atendimento para um negócio pequeno: ele busca nos documentos do 
 | S17a  | Limites de uso (por IP, por conversa, teto diário de tokens), conversas guardadas, medição de uso | **pronta**                                                        |
 | S17b  | Página de chat em React que usa a API                                                             | **pronta**                                                        |
 | S18   | Avaliação automática: 56 perguntas com a fonte esperada, `npm run eval`, limite calibrado         | **pronta**: 53 de 56 casos certos (95%), medido com o modelo real |
-| S19   | Deploy (Worker + Hyperdrive), demonstração pública, README final                                  | **código pronto; falta publicar** (ver "Deploy")                  |
+| S19   | Deploy (Worker + Hyperdrive), demonstração pública, README final                                  | **pronta**: no ar como um Worker da Cloudflare (ver "Deploy")     |
 
-Há uma **página de chat** (`apps/web`) e também dá para ingerir os textos, buscar e **perguntar pela linha de comando ou pela API**. A demonstração pública vem com o deploy.
+Há uma **página de chat** (`apps/web`) e também dá para ingerir os textos, buscar e **perguntar pela linha de comando ou pela API**. A demonstração pública é a página acima: tem limite de uso por IP, por conversa e por dia, então pode recusar quando a cota do dia acaba.
 
 ## Como rodar
 
@@ -74,7 +74,7 @@ Cada resposta do modelo grava os **tokens reais** na tabela `mensagem`; `npm run
 
 ### Avaliação (evals)
 
-`evals/perguntas.json` tem 48 perguntas, cada uma com o resultado esperado **de acordo com a base** (não com o que o chatbot respondeu): o texto que a resposta deve conter, o documento que deve ser recuperado, e as perguntas fora da base que devem ser recusadas. Inclui variações da mesma pergunta, perguntas sem acento e tentativas de injeção.
+`evals/perguntas.json` tem 56 perguntas, cada uma com o resultado esperado **de acordo com a base** (não com o que o chatbot respondeu): o texto que a resposta deve conter, o documento que deve ser recuperado, e as perguntas fora da base que devem ser recusadas. Inclui variações da mesma pergunta, perguntas sem acento e tentativas de injeção.
 
 ```bash
 npm run eval                          # roda todos os casos no mesmo código que a API usa
@@ -109,6 +109,21 @@ npm run test:integration  # com Postgres+pgvector (use um banco de TESTE: ele é
 ```
 
 O CI do GitHub roda tudo isso a cada push, com o provedor de mentira, **sem chamar nenhuma API**.
+
+## Resultado medido
+
+Rodada final com o modelo real (`@cf/meta/llama-3.1-8b-instruct-fp8-fast`), limite de similaridade 0,45 e margem de contexto 0,08, 56 perguntas repetidas 3 vezes (168 execuções):
+
+| O que se mediu                                | Resultado                                         |
+| --------------------------------------------- | ------------------------------------------------- |
+| Casos que passaram                            | 53 de 56 (95%), nenhum instável                   |
+| Perguntas que a base cobre, respondidas certo | 90 de 96 execuções (94%); recusou sem precisar: 0 |
+| Perguntas fora da base, recusadas             | 30 de 33 execuções (91%)                          |
+| Documento certo entre os recuperados          | 96 de 96 (100%)                                   |
+| Documento certo citado na resposta            | 92 de 96 (96%)                                    |
+| Gasto da rodada inteira                       | ≈ 636 neurons (6,4% da cota diária)               |
+
+**O que ainda erra (3 casos, todos registrados como falha conhecida em `evals/perguntas.json`):** "Quanto custa polir um SUV?" (o modelo escolhe um porte em vez de listar os dois); a mesma pergunta com uma tentativa de injeção junto (recusa sem dar o preço: seguro, mas inútil); e "Posso lavar o carro com sabão em pó?" (o modelo estende a regra do shampoo neutro, que vale depois da vitrificação, para qualquer carro; não é preço nem política inventados, mas o certo era recusar). **Risco aceito:** algumas perguntas fora da base ficam a poucos centésimos do limite (a piada marcou 0,445 contra 0,45), então uma pergunta nova do ramo pode passar e o modelo responder de cabeça; as duas barreiras e os casos de "resposta de cabeça" existem para isso. A calibração, rodada a rodada, está em [docs/calibracao-limiar.md](docs/calibracao-limiar.md).
 
 ## Decisões técnicas
 
