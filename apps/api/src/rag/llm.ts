@@ -36,24 +36,38 @@ export class FakeLlmProvider implements LlmProvider {
 // OpenAI (`choices[0].message.content`).
 // ---------------------------------------------------------------------------------------------
 
-const RespostaSchema = z.object({
-  success: z.boolean(),
-  result: z
+const ResultadoSchema = z.object({
+  response: z.string().nullish(),
+  choices: z
+    .array(z.object({ message: z.object({ content: z.string().nullish() }).nullish() }))
+    .nullish(),
+  usage: z
     .object({
-      response: z.string().nullish(),
-      choices: z
-        .array(z.object({ message: z.object({ content: z.string().nullish() }).nullish() }))
-        .nullish(),
-      usage: z
-        .object({
-          prompt_tokens: z.number().optional(),
-          completion_tokens: z.number().optional(),
-        })
-        .nullish(),
+      prompt_tokens: z.number().optional(),
+      completion_tokens: z.number().optional(),
     })
     .nullish(),
+});
+
+const RespostaSchema = z.object({
+  success: z.boolean(),
+  result: ResultadoSchema.nullish(),
   errors: z.array(z.object({ message: z.string() })).nullish(),
 });
+
+/** Transforma o `result` do Workers AI (REST ou binding) numa resposta; erra se vier sem texto. */
+export function resultadoParaResposta(resultado: unknown): RespostaLlm {
+  const r = ResultadoSchema.safeParse(resultado);
+  const texto = r.success ? (r.data.response ?? r.data.choices?.[0]?.message?.content) : undefined;
+  if (!r.success || typeof texto !== 'string' || !texto.trim()) {
+    throw new Error('Workers AI não devolveu texto de resposta (formato inesperado)');
+  }
+  return {
+    texto: texto.trim(),
+    tokensEntrada: r.data.usage?.prompt_tokens,
+    tokensSaida: r.data.usage?.completion_tokens,
+  };
+}
 
 export type OpcoesLlmWorkersAi = {
   accountId: string;
@@ -93,16 +107,7 @@ export class WorkersAiLlmProvider implements LlmProvider {
         `Workers AI recusou o pedido (HTTP ${resposta.status})${motivo ? `: ${motivo}` : ''}`,
       );
     }
-    const r = corpo.data.result;
-    const texto = r.response ?? r.choices?.[0]?.message?.content;
-    if (typeof texto !== 'string' || !texto.trim()) {
-      throw new Error('Workers AI não devolveu texto de resposta (formato inesperado)');
-    }
-    return {
-      texto: texto.trim(),
-      tokensEntrada: r.usage?.prompt_tokens,
-      tokensSaida: r.usage?.completion_tokens,
-    };
+    return resultadoParaResposta(corpo.data.result);
   }
 }
 
