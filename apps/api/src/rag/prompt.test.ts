@@ -71,7 +71,8 @@ describe('extrairCitacoes', () => {
 });
 
 describe('FRASE_RECUSA', () => {
-  it('oferece falar com um atendente', () => {
-    expect(FRASE_RECUSA).toContain('atendente');
+  it('indica o atendimento humano e não pede dados de contato', () => {
+    expect(FRASE_RECUSA).toContain('atendimento humano');
+    expect(FRASE_RECUSA.toLowerCase()).not.toContain('telefone');
   });
 });

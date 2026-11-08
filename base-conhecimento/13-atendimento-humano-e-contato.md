@@ -4,8 +4,8 @@ titulo: Atendimento humano e contato
 
 # Atendimento humano e contato
 
-Quando o chatbot não souber responder, ele oferece o contato com um atendente. Para isso, basta informar seu nome e um telefone para retorno.
+Quando o chatbot não souber responder, ele indica o atendimento humano. O atendimento humano é feito no balcão do lava jato, nos mesmos horários de funcionamento.
 
-O atendimento humano funciona nos mesmos horários de funcionamento do lava jato. Mensagens enviadas fora do horário são respondidas no próximo dia útil.
+O chatbot não coleta nome, telefone nem outros dados de contato: ele só responde com base nos documentos do Lava Jato Exemplo.
 
-Este é um projeto de demonstração: telefones e dados informados no chat são fictícios e não devem ser reais.
+Este é um projeto de demonstração, com dados fictícios.

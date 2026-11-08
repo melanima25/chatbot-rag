@@ -148,3 +148,21 @@ Leituras:
 ### Margem de contexto
 
 Para separar "responder ou não" de "quanto contexto mandar ao modelo", criei `MARGEM_CONTEXTO` (padrão 1 = desligada): o limite decide se responde; o contexto só leva os trechos até essa distância do melhor. Com limite 0,50 e margem 0,08, uma pergunta com melhor trecho 0,635 só leva trechos a partir de 0,555 (parecido com o limite antigo), e uma com melhor trecho 0,549 ainda leva os vizinhos acima de 0,50. **Medida em 29/10 (rodada C): melhor taxa de acerto e 19% menos tokens que a rodada B.** Ainda não é o padrão do código; falta a rodada com a base corrigida.
+
+### Rodada G (07 e 08/11/2026): recusa sem captura de contato
+
+Depois do deploy descobri que a frase de recusa pedia "nome e um telefone para retorno", mas o chat não tem captura de contato (era um item do escopo inicial que ficou de fora). Troquei a frase por uma indicação do atendimento humano e reescrevi os textos 13 e 14 da base (o chatbot não coleta dados). Isso exigiu medir de novo:
+
+| O que se mediu                           | Resultado                           |
+| ---------------------------------------- | ----------------------------------- |
+| Casos que passaram (56 × 3)              | 53 de 56 (95%), nenhum instável     |
+| Cobertas certas / fora da base recusadas | 90 de 96 (94%) / 30 de 33 (91%)     |
+| Fonte recuperada / citada                | 96 de 96 / 92 de 96                 |
+| Gasto                                    | ≈ 643 neurons (6,4% da cota do dia) |
+
+Lições da rodada:
+
+1. **Uma rodada com 3 repetições não basta para confiar num caso.** O feriado (17) passou 3/3 na rodada anterior, mas, medido 10 vezes, acertava 2 de 10: o texto de horário tinha uma frase sobre "véspera de feriado" (horário reduzido) ao lado de "feriados nacionais: fechado", e o modelo as fundia ("abrimos em feriados, com horário reduzido"). Remover o parágrafo (que eu mesmo tinha inventado, sem caso de teste) não bastou: a nova linha "Não abrimos em nenhum feriado nacional" fez o modelo responder "Não, abrimos em nenhum feriado nacional" (sentido certo, frase torta, 9 de 10). Com "O lava jato fica fechado em todos os feriados nacionais" o caso voltou a 3/3.
+2. **A redação da base é copiada pelo modelo:** a frase que está no texto é a frase que sai na resposta, vícios inclusos. Escrever a linha como se fosse a resposta ideal funciona melhor do que descrever a regra.
+3. **Caso 40 (parcelar em 12 vezes):** a resposta estava certa ("máximo de 3 sem juros"), mas a expectativa só aceitava "3 vezes"; ampliei para as formas equivalentes.
+4. **Funilaria (6) é instável:** 2 respostas "Sim, fazemos funilaria" em 16 execuções, com o contexto correto. Fica registrado como risco conhecido (README, observação do caso).

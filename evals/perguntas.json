@@ -53,7 +53,7 @@
       "fonte": "12-veiculos-atendidos.md|16-o-que-nao-fazemos.md",
       "deveConter": ["não fazemos|não realizamos|não oferecemos|não faz|não realiza|não oferece"],
       "revisado": false,
-      "observacao": "Com a pontuação em 0,430 era recusada pelo limite; o documento 16-o-que-nao-fazemos.md a levou para 0,489 e, com limite 0,45, passou a ser respondida."
+      "observacao": "Com a pontuação em 0,430 era recusada pelo limite; o documento 16-o-que-nao-fazemos.md a levou para 0,489 e, com limite 0,45, passou a ser respondida. ATENÇÃO, caso instável: em 08/11/2026 respondeu 'Sim, fazemos funilaria.' (citando o próprio documento 16, que diz o contrário) em 2 de 16 execuções; é erro de polaridade do modelo pequeno diante de uma lista do que NÃO se faz, e é grave quando acontece. Se voltar a falhar, é esperado: não é regressão nova."
     },
     {
       "id": 7,
@@ -149,7 +149,7 @@
       "esperado": "resposta",
       "fonte": "02-horario-de-funcionamento.md",
       "deveConter": ["fechado|fechamos|fecham|não abr|não funcion"],
-      "observacao": "A base fala em feriados nacionais (fechado) e véspera de feriado (horário reduzido). O modelo às vezes troca os dois ('abrem apenas em véspera de feriado').",
+      "observacao": "A base diz: feriados nacionais, fechado. Havia também um parágrafo sobre véspera de feriado (horário reduzido) e o modelo fundia os dois ('abrimos em feriados, com horário reduzido'): errou 8 de 10 execuções em 07/11/2026. O parágrafo foi removido do texto 02.",
       "revisado": false
     },
     {
@@ -282,7 +282,7 @@
       "esperado": "resposta",
       "fonte": "14-privacidade-dos-dados.md",
       "deveConter": ["não"],
-      "observacao": "A base diz que só pede nome e telefone, e só para falar com atendente.",
+      "observacao": "A base diz que o chat não pede dados pessoais nem de cartão.",
       "revisado": false
     },
     {
@@ -338,7 +338,7 @@
       "pergunta": "Dá para parcelar em 12 vezes?",
       "esperado": "resposta",
       "fonte": "15-parcelamento-no-cartao.md",
-      "deveConter": ["3 vezes|três vezes"],
+      "deveConter": ["3 vezes|três vezes|3 parcelas|3 sem juros|até 3|máximo de 3"],
       "naoDeveConter": ["12 vezes sem juros", "sim, é possível parcelar em 12"],
       "observacao": "A base só permite até 3 vezes.",
       "revisado": false

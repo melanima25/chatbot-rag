@@ -1,0 +1,177 @@
+{
+  "data": "2026-11-08T02:53:22.791Z",
+  "modeloTexto": "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
+  "modeloEmbedding": "@cf/baai/bge-m3",
+  "opcoes": {
+    "limite": 0.45,
+    "margem": 0.08,
+    "topK": 4,
+    "repeticoes": 10
+  },
+  "resumo": {
+    "total": 1,
+    "revisados": 0,
+    "passaram": 1,
+    "instaveis": 0,
+    "falhasNovas": [],
+    "falhasConhecidas": [],
+    "conhecidasQuePassam": [],
+    "respostasEsperadas": {
+      "total": 10,
+      "certas": 10,
+      "falsasRecusas": 0
+    },
+    "recusasEsperadas": {
+      "total": 0,
+      "certas": 0,
+      "respostasIndevidas": 0
+    },
+    "fonte": {
+      "total": 10,
+      "recuperada": 10,
+      "citada": 10
+    },
+    "tokensEntrada": 5730,
+    "tokensSaida": 240,
+    "neurons": 31.97019
+  },
+  "casos": [
+    {
+      "id": 17,
+      "pergunta": "Abrem em feriado?",
+      "estado": "passou",
+      "tentativas": [
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não, o lava jato fica fechado em todos os feriados nacionais. [1]",
+          "fontes": [
+            {
+              "caminho": "02-horario-de-funcionamento.md",
+              "similaridade": 0.617,
+              "citada": true
+            }
+          ]
+        },
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não, o lava jato fica fechado em todos os feriados nacionais. [1]",
+          "fontes": [
+            {
+              "caminho": "02-horario-de-funcionamento.md",
+              "similaridade": 0.617,
+              "citada": true
+            }
+          ]
+        },
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não, o lava jato fica fechado em todos os feriados nacionais. [1]",
+          "fontes": [
+            {
+              "caminho": "02-horario-de-funcionamento.md",
+              "similaridade": 0.617,
+              "citada": true
+            }
+          ]
+        },
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não, o lava jato fica fechado em todos os feriados nacionais. [1]",
+          "fontes": [
+            {
+              "caminho": "02-horario-de-funcionamento.md",
+              "similaridade": 0.617,
+              "citada": true
+            }
+          ]
+        },
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não, o lava jato fica fechado em todos os feriados nacionais. [1]",
+          "fontes": [
+            {
+              "caminho": "02-horario-de-funcionamento.md",
+              "similaridade": 0.617,
+              "citada": true
+            }
+          ]
+        },
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não, o lava jato fica fechado em todos os feriados nacionais. [1]",
+          "fontes": [
+            {
+              "caminho": "02-horario-de-funcionamento.md",
+              "similaridade": 0.617,
+              "citada": true
+            }
+          ]
+        },
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não, o lava jato fica fechado em todos os feriados nacionais.\n\n[1]",
+          "fontes": [
+            {
+              "caminho": "02-horario-de-funcionamento.md",
+              "similaridade": 0.617,
+              "citada": true
+            }
+          ]
+        },
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não, o lava jato fica fechado em todos os feriados nacionais. [1]",
+          "fontes": [
+            {
+              "caminho": "02-horario-de-funcionamento.md",
+              "similaridade": 0.617,
+              "citada": true
+            }
+          ]
+        },
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não, o lava jato fica fechado em todos os feriados nacionais. [1]",
+          "fontes": [
+            {
+              "caminho": "02-horario-de-funcionamento.md",
+              "similaridade": 0.617,
+              "citada": true
+            }
+          ]
+        },
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não, o lava jato fica fechado em todos os feriados nacionais.\n\n[1]",
+          "fontes": [
+            {
+              "caminho": "02-horario-de-funcionamento.md",
+              "similaridade": 0.617,
+              "citada": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
