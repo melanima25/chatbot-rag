@@ -1,5 +1,7 @@
 # Chatbot RAG: atendimento que responde só com base nos documentos
 
+[![CI](https://github.com/melanima25/chatbot-rag/actions/workflows/ci.yml/badge.svg)](https://github.com/melanima25/chatbot-rag/actions/workflows/ci.yml)
+
 > **Demonstração no ar:** https://chatbot-rag.brenojf19.workers.dev/ · O negócio, os preços e os textos são **fictícios** ("Lava Jato Exemplo"). Não há dados reais.
 
 ![Demonstração: o chatbot responde sobre parcelamento citando as fontes e recusa uma pergunta fora da base](docs/demo.gif)
