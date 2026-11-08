@@ -1,0 +1,177 @@
+{
+  "data": "2026-11-08T03:05:40.331Z",
+  "modeloTexto": "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
+  "modeloEmbedding": "@cf/baai/bge-m3",
+  "opcoes": {
+    "limite": 0.45,
+    "margem": 0.08,
+    "topK": 4,
+    "repeticoes": 10
+  },
+  "resumo": {
+    "total": 1,
+    "revisados": 0,
+    "passaram": 1,
+    "instaveis": 0,
+    "falhasNovas": [],
+    "falhasConhecidas": [],
+    "conhecidasQuePassam": [],
+    "respostasEsperadas": {
+      "total": 10,
+      "certas": 10,
+      "falsasRecusas": 0
+    },
+    "recusasEsperadas": {
+      "total": 0,
+      "certas": 0,
+      "respostasIndevidas": 0
+    },
+    "fonte": {
+      "total": 10,
+      "recuperada": 10,
+      "citada": 10
+    },
+    "tokensEntrada": 6150,
+    "tokensSaida": 210,
+    "neurons": 32.65413
+  },
+  "casos": [
+    {
+      "id": 6,
+      "pergunta": "Vocês fazem funilaria?",
+      "estado": "passou",
+      "tentativas": [
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não, não fazemos funilaria. [1]",
+          "fontes": [
+            {
+              "caminho": "16-o-que-nao-fazemos.md",
+              "similaridade": 0.489,
+              "citada": true
+            }
+          ]
+        },
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não, não fazemos funilaria. [1]",
+          "fontes": [
+            {
+              "caminho": "16-o-que-nao-fazemos.md",
+              "similaridade": 0.489,
+              "citada": true
+            }
+          ]
+        },
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não, o Lava Jato Exemplo não faz funilaria. Não fazemos mecanica, funilaria e troca de peças. [1]",
+          "fontes": [
+            {
+              "caminho": "16-o-que-nao-fazemos.md",
+              "similaridade": 0.489,
+              "citada": true
+            }
+          ]
+        },
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não, o Lava Jato Exemplo não faz funilaria. [1]",
+          "fontes": [
+            {
+              "caminho": "16-o-que-nao-fazemos.md",
+              "similaridade": 0.489,
+              "citada": true
+            }
+          ]
+        },
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não, não fazemos funilaria. [1]",
+          "fontes": [
+            {
+              "caminho": "16-o-que-nao-fazemos.md",
+              "similaridade": 0.489,
+              "citada": true
+            }
+          ]
+        },
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não fazemos funilaria. Não fazemos mecanica, funilaria e troca de peças. [1]",
+          "fontes": [
+            {
+              "caminho": "16-o-que-nao-fazemos.md",
+              "similaridade": 0.489,
+              "citada": true
+            }
+          ]
+        },
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não, o Lava Jato Exemplo não faz mecânica, funilaria e troca de peças. [1]",
+          "fontes": [
+            {
+              "caminho": "16-o-que-nao-fazemos.md",
+              "similaridade": 0.489,
+              "citada": true
+            }
+          ]
+        },
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não, não fazemos funilaria. Não oferecemos serviços de mecânica, funilaria e troca de peças. [1]",
+          "fontes": [
+            {
+              "caminho": "16-o-que-nao-fazemos.md",
+              "similaridade": 0.489,
+              "citada": true
+            }
+          ]
+        },
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não, não fazemos funilaria. [1]",
+          "fontes": [
+            {
+              "caminho": "16-o-que-nao-fazemos.md",
+              "similaridade": 0.489,
+              "citada": true
+            }
+          ]
+        },
+        {
+          "ok": true,
+          "falhas": [],
+          "tipo": "resposta",
+          "texto": "Não, não fazemos funilaria. [1]",
+          "fontes": [
+            {
+              "caminho": "16-o-que-nao-fazemos.md",
+              "similaridade": 0.489,
+              "citada": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

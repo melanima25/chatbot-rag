@@ -3,7 +3,7 @@ import type { Mensagem } from './llm';
 /** Resposta fixa quando não há de onde tirar a resposta (o modelo nem é chamado nesse caso). */
 export const FRASE_RECUSA =
   'Não encontrei essa informação nos documentos do Lava Jato Exemplo. ' +
-  'Quer falar com um atendente? É só me passar seu nome e um telefone para retorno.';
+  'Para esse assunto, fale com o nosso atendimento humano, no balcão do lava jato.';
 
 /** Palavra combinada com o modelo para "os trechos não respondem". */
 export const MARCADOR_SEM_RESPOSTA = 'NAO_ENCONTREI';

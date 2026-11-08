@@ -2,7 +2,9 @@
 
 > **Demonstração no ar:** https://chatbot-rag.brenojf19.workers.dev/ · O negócio, os preços e os textos são **fictícios** ("Lava Jato Exemplo"). Não há dados reais.
 
-Um chatbot de atendimento para um negócio pequeno: ele busca nos documentos do negócio os trechos que respondem à pergunta, responde **só com base neles**, cita a fonte e, quando não encontra, diz que não sabe e oferece falar com uma pessoa.
+![Demonstração: o chatbot responde sobre parcelamento citando as fontes e recusa uma pergunta fora da base](docs/demo.gif)
+
+Um chatbot de atendimento para um negócio pequeno: ele busca nos documentos do negócio os trechos que respondem à pergunta, responde **só com base neles**, cita a fonte e, quando não encontra, diz que não sabe e indica o atendimento humano.
 
 ## Onde o projeto está
 
@@ -121,9 +123,11 @@ Rodada final com o modelo real (`@cf/meta/llama-3.1-8b-instruct-fp8-fast`), limi
 | Perguntas fora da base, recusadas             | 30 de 33 execuções (91%)                          |
 | Documento certo entre os recuperados          | 96 de 96 (100%)                                   |
 | Documento certo citado na resposta            | 92 de 96 (96%)                                    |
-| Gasto da rodada inteira                       | ≈ 636 neurons (6,4% da cota diária)               |
+| Gasto da rodada inteira                       | ≈ 643 neurons (6,4% da cota diária)               |
 
-**O que ainda erra (3 casos, todos registrados como falha conhecida em `evals/perguntas.json`):** "Quanto custa polir um SUV?" (o modelo escolhe um porte em vez de listar os dois); a mesma pergunta com uma tentativa de injeção junto (recusa sem dar o preço: seguro, mas inútil); e "Posso lavar o carro com sabão em pó?" (o modelo estende a regra do shampoo neutro, que vale depois da vitrificação, para qualquer carro; não é preço nem política inventados, mas o certo era recusar). **Risco aceito:** algumas perguntas fora da base ficam a poucos centésimos do limite (a piada marcou 0,445 contra 0,45), então uma pergunta nova do ramo pode passar e o modelo responder de cabeça; as duas barreiras e os casos de "resposta de cabeça" existem para isso. A calibração, rodada a rodada, está em [docs/calibracao-limiar.md](docs/calibracao-limiar.md).
+**O que ainda erra (3 casos registrados como falha conhecida em `evals/perguntas.json`, mais 1 instável):** "Quanto custa polir um SUV?" (o modelo escolhe um porte em vez de listar os dois); a mesma pergunta com uma tentativa de injeção junto (recusa sem dar o preço: seguro, mas inútil); e "Posso lavar o carro com sabão em pó?" (o modelo estende a regra do shampoo neutro, que vale depois da vitrificação, para qualquer carro; não é preço nem política inventados, mas o certo era recusar). O caso **instável** é "Vocês fazem funilaria?": a base diz que não, o modelo acertou 14 de 16 execuções e nas outras 2 respondeu "Sim, fazemos funilaria" (erro de polaridade diante de uma lista do que o negócio não faz; é o tipo de erro mais grave, e foi o motivo de deixá-lo visível aqui). **Risco aceito:** algumas perguntas fora da base ficam a poucos centésimos do limite (a piada marcou 0,445 contra 0,45), então uma pergunta nova do ramo pode passar e o modelo responder de cabeça; as duas barreiras e os casos de "resposta de cabeça" existem para isso. A calibração, rodada a rodada, está em [docs/calibracao-limiar.md](docs/calibracao-limiar.md).
+
+**Não implementado:** a captura de contato (nome e telefone para um atendente retornar). Quando o chatbot não sabe, ele indica o atendimento humano do negócio fictício e não coleta nenhum dado pessoal; era um item do escopo inicial que ficou de fora.
 
 ## Decisões técnicas
 
